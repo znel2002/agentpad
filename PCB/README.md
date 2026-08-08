@@ -4,12 +4,21 @@ KiCad source for the AgentPad board. Design locked in
 [../docs/DESIGN-SPEC.md](../docs/DESIGN-SPEC.md).
 
 ## Before you start
-1. Install KiCad (stable 8.x/9.x — confirm the version against the Hackpad guide +
-   care package in #hackpad first).
-2. Drop Hack Club's footprint/symbol **care package** here (XIAO RP2040 + SK6812).
-   - Guide: https://hackpad.hackclub.com/guide
-   - Repo + reference boards: https://github.com/hackclub/hackpad
-3. Build the 3-key tutorial board first to validate the toolchain.
+1. KiCad **10.0.5** is installed. Its libraries are forward-compatible, so the
+   care package (authored on an older version) loads fine — no version issue.
+2. Download + install the libraries here:
+   - **Care package** (XIAO symbol + footprints): https://github.com/hackclub/hackpad/releases/tag/v0.1-bugfix → `kicad_care_package.zip`
+   - XIAO footprints (backup): https://github.com/Seeed-Studio/OPL_Kicad_Library
+   - MX switch footprints: https://github.com/ai03-2725/MX_V2
+   - Rotary encoder: https://kicad.github.io/footprints/Rotary_Encoder
+   - 0.91" OLED (4-pin): https://github.com/gorbachev/KiCad-SSD1306-0.91-OLED-4pin-128x32.pretty
+   - The `.sym` files are symbol libs; the `.pretty` folders are footprint libs
+     (Preferences → Manage Symbol/Footprint Libraries → add).
+3. **Reference board** — the guide author's macropad (OLED + encoder + matrix +
+   SK6812, closest to ours): https://github.com/hackclub/hackpad/tree/clean/extras/orpheuspad
+4. Learn the flow: ai03's PCB guide https://wiki.ai03.com/books/pcb-design
+5. Build the 3-key tutorial board first (XIAO symbol = `MODULE-SEEEDUINO-XIAO`,
+   switches = `SW_Push`) to validate the toolchain, then extend to this net map.
 
 ## Net map — XIAO RP2040 pad → net (all 11 GPIO used)
 
@@ -51,9 +60,21 @@ KiCad source for the AgentPad board. Design locked in
 - Kit ships no caps/resistors; per-LED decoupling is optional for a chain this
   small. Keep the data trace short from the XIAO to LED1.
 
+## Mounting holes (from the Hackpad resources page)
+- Use KiCad's **M3 mounting-hole footprint** — NOT Edge.Cuts.
+- 6 holes to match the 6× M3 screws / heatset inserts.
+- For the OLED, a plain **4-pin header footprint** is fine (order GND-VCC-SCL-SDA).
+
+## Routing tips (from the resources page)
+- Try to route everything on **one layer** first; only drop to the 2nd layer to
+  avoid a big loop. Keeps the board clean.
+- After routing: **Tools → Cleanup Tracks & Vias** (press "Build changes" twice).
+- Export the PCB to PDF and print 1:1 to sanity-check physical measurements.
+
 ## Preflight before ordering
 - [ ] Board ≤ 100 × 100 mm, **2 layers**.
 - [ ] `AgentPad` on the silkscreen.
+- [ ] 6× M3 mounting-hole footprints placed.
 - [ ] **DRC → 0 errors** (reviewers check this).
 - [ ] Export gerbers → `../production/gerbers.zip`.
 - [ ] Order JLCPCB immediately after DRC is clean.
