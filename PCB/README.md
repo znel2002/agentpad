@@ -44,14 +44,17 @@ KiCad source for the AgentPad board. Design locked in
 
 ## Exact symbols / footprints (confirmed on hackpad.hackclub.com/add-components)
 
-| Part | Symbol | Footprint |
-|---|---|---|
-| XIAO RP2040 | `MODULE-SEEEDUINO-XIAO` (care package) | care-package XIAO footprint |
-| MX switch | `SW_Push` | care package / `ai03-2725/MX_V2` |
-| Diode 1N4148 | `D` | `Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal` (don't go shorter) |
-| EC11 encoder | `RotaryEncoder_Switch` | `RotaryEncoder_Alps_EC11E-Switch_Vertical_H20mm` |
-| SK6812 MINI-E | `SK6812MINI-E` (care package) | `SK6812MINI-E` (**not** SK6812MINI) |
-| 0.91" OLED | 4-pin header | 2.54 mm 4-pin header footprint |
+Verified against the unpacked care package in `lib/kicad_care_package/`. The care
+package holds **only** the XIAO + SK6812; everything else is a KiCad built-in lib.
+
+| Part | Symbol | Footprint | Source |
+|---|---|---|---|
+| XIAO RP2040 | `MOUDLE-SEEEDUINO-XIAO` *(sic — typo is in the file, search it literally)* | `XIAO-Generic-Hybrid-14P-2.54-21X17.8MM` | care package |
+| SK6812 MINI-E | `SK6812MINI-E` | `SK6812MINI-E_fixed` | care package |
+| MX switch | `SW_Push` | `ai03-2725/MX_V2` (or KiCad `Button_Switch_Keyboard`) | KiCad / MX_V2 |
+| Diode 1N4148 | `D` | `Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal` (don't go shorter) | KiCad built-in |
+| EC11 encoder | `RotaryEncoder_Switch` | `RotaryEncoder_Alps_EC11E-Switch_Vertical_H20mm` | KiCad built-in |
+| 0.91" OLED | 4-pin header (`Connector_Generic`) | `PinHeader_1x04_P2.54mm_Vertical` | KiCad built-in |
 
 No pull-up resistors anywhere — the RP2040 has internal pull-ups (kit relies on this).
 
