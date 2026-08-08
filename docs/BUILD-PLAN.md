@@ -42,6 +42,15 @@ The shortest path from here to a submitted Hackpad board. Design is locked in
 - [ ] Export one STEP/3MF of the assembly → `CAD/`; per-part STL/STEP → `production/`.
 
 ## Session 5 — assemble + ship
-- [ ] Solder (watch diode orientation), flash `firmware.uf2` → `production/`.
-- [ ] README screenshots: full render + schematic + PCB + case-fit.
-- [ ] Ship post in **#hackpad-ships** + submit the form.
+Assembly order matters (from hackpad.hackclub.com/assembly):
+- [ ] Solder **diodes first** — the black bar marks the cathode; match COL2ROW.
+      Clip the legs after.
+- [ ] **Clip switches into the plate BEFORE soldering them to the PCB** (don't skip).
+- [ ] Solder the XIAO, encoder, OLED header, SK6812s (watch the notch orientation).
+- [ ] Run an **electrical test** before closing the case.
+- [ ] Assemble the sandwich; flash firmware.
+- [ ] production/: `gerbers.zip`, per-part case STL/STEP, and **`main.py`** (KMK needs
+      no `.uf2` — the source file is the deliverable).
+- [ ] README screenshots (all required): overall render + schematic + PCB + case-fit + BOM.
+- [ ] Ship post in **#hackpad-ships** (name / repo / description / images), submit the form.
+- [ ] After approval + build: submit for a **serial number**.

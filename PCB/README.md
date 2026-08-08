@@ -35,30 +35,55 @@ KiCad source for the AgentPad board. Design locked in
 | D8 | GP2 | COL2 |
 | D9 | GP4 | ENC_A |
 | D10 | GP3 | ENC_B |
-| 3V3 | — | OLED VCC, all SK6812 VDD |
+| 3V3 | — | OLED VCC |
+| **5V** | — | **all SK6812 VCC** (the LEDs are 5V parts, per the Hackpad add-components page) |
 | GND | — | matrix/encoder commons, OLED GND, all SK6812 GND |
 
+> Data logic stays at the XIAO's 3.3V; SK6812 run their VCC at 5V (the XIAO's 5V/USB
+> pad). This is how the kit is designed — do not put SK6812 VCC on 3V3.
+
+## Exact symbols / footprints (confirmed on hackpad.hackclub.com/add-components)
+
+| Part | Symbol | Footprint |
+|---|---|---|
+| XIAO RP2040 | `MODULE-SEEEDUINO-XIAO` (care package) | care-package XIAO footprint |
+| MX switch | `SW_Push` | care package / `ai03-2725/MX_V2` |
+| Diode 1N4148 | `D` | `Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal` (don't go shorter) |
+| EC11 encoder | `RotaryEncoder_Switch` | `RotaryEncoder_Alps_EC11E-Switch_Vertical_H20mm` |
+| SK6812 MINI-E | `SK6812MINI-E` (care package) | `SK6812MINI-E` (**not** SK6812MINI) |
+| 0.91" OLED | 4-pin header | 2.54 mm 4-pin header footprint |
+
+No pull-up resistors anywhere — the RP2040 has internal pull-ups (kit relies on this).
+
 ## Matrix (3×3, 9 keys)
-- One 1N4148 **per key**, all the **same orientation (COL2ROW)**. Wrong diode
-  direction is the #1 beginner failure — verify against the KMK config
-  (`Firmware/kmk/main.py`, `diode_orientation = COL2ROW`).
+- One **1N4148** (onsemi) per key, all the **same orientation (COL2ROW)**. Wrong
+  diode direction is the #1 beginner failure — verify against the KMK config
+  (`Firmware/kmk/main.py`, `diode_orientation = COL2ROW`). The physical diode has
+  a **black bar** marking the cathode.
+- Footprint `Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal`.
 - Keys map row-major to the keymap: R1C1..R1C3, R2C1..R2C3, R3C1..R3C3.
 
-## Encoder (EC11)
-- A → ENC_A (D9), B → ENC_B (D10), common → GND.
-- **Turn-only config:** the encoder's push-switch pins are left unconnected (no
-  free GPIO / matrix node). Add a pad footprint anyway so an 8-key clickable
-  variant stays possible without a respin.
+## Encoder (EC11E, 20 mm D-shaft)
+- Symbol `RotaryEncoder_Switch`, footprint `RotaryEncoder_Alps_EC11E-Switch_Vertical_H20mm`.
+- A → ENC_A (D9), B → ENC_B (D10), common → GND. No pull-ups needed.
+- **Turn-only config:** the footprint includes the push-switch pins — leave them
+  **unconnected**. Keeping the pads means an 8-key clickable variant is possible
+  later without a respin.
 
-## OLED (0.91" SSD1306, I2C @ 0x3C)
-- **Footprint pin order is GND-VCC-SCL-SDA** (kit spec) — match it exactly.
-- SDA→D4, SCL→D5, VCC→3V3, GND→GND.
+## OLED (0.91" 128×32 SSD1306, I2C @ 0x3C)
+- Footprint = plain **2.54 mm 4-pin header** (the module has a standard header;
+  no special footprint needed).
+- **Pin order GND-VCC-SCL-SDA** — match it exactly (online pinouts vary).
+- SDA→D4, SCL→D5, VCC→3V3, GND→GND. No pull-ups needed.
 
-## SK6812 chain (20 LEDs, 1 data line)
-- D3 → LED1 DIN; each LED DOUT → next LED DIN; chain all 20.
+## SK6812 MINI-E chain (20 LEDs, 1 data line)
+- Footprint `SK6812MINI-E` from the care package (**not** `SK6812MINI`; symbol +
+  both footprints must say MINI-E).
+- 4 pins: VCC (**5V**), GND, DIN, DOUT. D3 → LED1 DIN; each DOUT → next DIN; chain all 20.
+- **Orientation: the notch/cut is on the bottom-right corner** — wrong rotation and
+  the LEDs won't light. Keep every LED the same way.
 - 9 per-key (under each switch) + up to 11 case underglow.
-- Kit ships no caps/resistors; per-LED decoupling is optional for a chain this
-  small. Keep the data trace short from the XIAO to LED1.
+- Keep the data trace from the XIAO to LED1 short.
 
 ## Mounting holes (from the Hackpad resources page)
 - Use KiCad's **M3 mounting-hole footprint** — NOT Edge.Cuts.

@@ -121,7 +121,11 @@ read the host.
 ---
 
 ## 7. Open items before layout
-- [ ] Confirm Germany shipping + current grant amounts in #hackpad Slack.
+- [ ] **Germany shipping** — ships from Burlington VT; the site never addresses
+      international shipping. Confirm in #hackpad (the one real unknown).
+- [ ] **Grant amount conflict** — the submitting page says **$15** for the PCB, the
+      FAQ says **$10**. Confirm the current number in #hackpad. (Iron grant is $18,
+      non-transferrable, both pages agree.)
 - [ ] Confirm the kit's MX switch type (tactile vs linear) in #hackpad.
 - [ ] Finalize Codex / Cursor / shell per-layer keystroke tables.
 - [ ] Decide 9-key-turn-only vs 8-key-clickable-encoder (default: 9-key).
