@@ -1,0 +1,9 @@
+# build artifacts / fab outputs (keep sources, ignore generated)
+*.bak
+*-backups/
+fp-info-cache
+*.kicad_prj.lck
+_autosave-*
+.DS_Store
+__pycache__/
+*.pyc
