@@ -1,8 +1,7 @@
 # AgentPad — Hardware & UX Design Spec (v1)
 
 Status: **locked, pre-layout.** This is the buildable design the PCB, case, and
-firmware are cut from. Concept + prior-art analysis live in the RoadtoStanford
-vault: `wiki/goals/Agent Keyboard (Hackpad).md`.
+firmware are cut from.
 
 ---
 

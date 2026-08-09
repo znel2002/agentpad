@@ -7,3 +7,12 @@ _autosave-*
 .DS_Store
 __pycache__/
 *.pyc
+
+# KiCad local / auto-generated (not source)
+*.kicad_prl
+.history/
+_restore_backup_*/
+*.rpt
+
+# throwaway 3-key tutorial board (not part of the submission)
+tutorial3key/

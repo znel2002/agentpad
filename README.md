@@ -16,7 +16,6 @@ per-tool **LAYER** switching instead of app-detection.
 > - **PCB net map + KiCad steps:** [PCB/README.md](PCB/README.md)
 > - **Firmware setup + KMK skeleton:** [Firmware/README.md](Firmware/README.md)
 > - **#hackpad message to send:** [docs/hackpad-slack-message.md](docs/hackpad-slack-message.md)
-> - Full concept dossier lives in the RoadtoStanford vault: `wiki/goals/Agent Keyboard (Hackpad).md`
 
 ## Hardware (locked — Config A, kit-only)
 - **MCU:** Seeed XIAO RP2040 (11 usable GPIO — the binding constraint)
