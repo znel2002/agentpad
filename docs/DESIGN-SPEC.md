@@ -1,7 +1,13 @@
 # AgentPad — Hardware & UX Design Spec (v1)
 
-Status: **locked, pre-layout.** This is the buildable design the PCB, case, and
-firmware are cut from.
+Status: **v1 PCB complete, DRC 0 errors.** This is the buildable design the PCB,
+case, and firmware are cut from.
+
+> **v1 ships without RGB LEDs.** The SK6812 reverse-mount footprint (with its
+> built-in board cutout) could not pass edge-clearance DRC, and RGB is not
+> required by Hackpad (the reference board barely used LEDs). v1 = 9 switches +
+> encoder + OLED. **RGB (per-key / underglow) is deferred to v2** with a proper
+> LED footprint.
 
 ---
 

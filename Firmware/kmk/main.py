@@ -108,28 +108,11 @@ encoder.map = [
 ]
 
 # ----------------------------------------------------------------------------
-# RGB — static per-key function colors (the legend). Index order must match the
-# SK6812 CHAIN order on the PCB; adjust once the layout is fixed. Driven directly
-# via neopixel (not the KMK RGB extension) so colors are simple and static.
-# Enhancement: hook the KMK loop for press-flash + active-layer underglow.
+# RGB — deferred to v2. The shipping v1 board has NO LEDs: the SK6812 reverse-mount
+# footprint (with its built-in board cutout) fought DRC, and per-key/underglow RGB
+# is not required by Hackpad (the reference board barely used LEDs). Data pin D3
+# (XIAO pin 4) is left unused on v1. v2 will add a proper RGB footprint + this block.
 # ----------------------------------------------------------------------------
-try:
-    import neopixel
-
-    KEY_COLORS = [
-        (255, 0, 0),   (0, 255, 0),   (255, 120, 0),   # STOP  YES   NO
-        (0, 0, 255),   (160, 0, 255), (0, 200, 255),   # PLAN  NEW   TALK
-        (255, 255, 255), (0, 255, 180), (255, 150, 0), # RUN   COMPACT  LAYER
-    ]
-    pixels = neopixel.NeoPixel(board.D3, 20, brightness=0.3, auto_write=False)
-    for i, color in enumerate(KEY_COLORS):
-        pixels[i] = color
-    # LEDs 9..19 = case underglow; leave as a dim wash for now
-    for i in range(len(KEY_COLORS), 20):
-        pixels[i] = (10, 10, 10)
-    pixels.show()
-except Exception as exc:  # noqa: BLE001 - don't let RGB kill the keyboard
-    print("RGB init skipped:", exc)
 
 # ----------------------------------------------------------------------------
 # OLED — boot splash + status. Needs adafruit_displayio_ssd1306 in CIRCUITPY/lib.

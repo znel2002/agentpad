@@ -16,3 +16,14 @@ _restore_backup_*/
 
 # throwaway 3-key tutorial board (not part of the submission)
 tutorial3key/
+
+# loose gerber exports (only gerbers.zip is tracked)
+*.gbr
+*.drl
+*.gbrjob
+
+# routing intermediates + KiCad lock files
+*.dsn
+*.ses
+*.lck
+~*.lck

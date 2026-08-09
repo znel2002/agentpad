@@ -19,7 +19,7 @@ per-tool **LAYER** switching instead of app-detection.
 
 ## Hardware (locked — Config A, kit-only)
 - **MCU:** Seeed XIAO RP2040 (11 usable GPIO — the binding constraint)
-- **Keys:** 9 MX switches in a 3×3 matrix  ·  **Encoder:** 1× EC11 (turn-only)  ·  **Display:** 1× 0.91" OLED  ·  **RGB:** 20× SK6812 (9 per-key + underglow, one data line)
+- **Keys:** 9 MX switches in a 3×3 matrix  ·  **Encoder:** 1× EC11 (turn-only)  ·  **Display:** 1× 0.91" OLED  ·  **RGB:** deferred to v2 (v1 ships without LEDs)
 - **Firmware:** KMK (CircuitPython) — QMK as fallback
 - **Layers:** 4 tool profiles — Claude Code · Codex · Cursor · shell
 
