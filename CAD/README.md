@@ -1,7 +1,20 @@
 # CAD — AgentPad case
 
-3D-printed sandwich case. Design in Fusion 360 (or FreeCAD). Export one STEP/3MF
-of the full assembly here; per-part STL/STEP go in `../production/`.
+3D-printed sandwich case, built parametrically in **OpenSCAD**: [agentpad_case.scad](agentpad_case.scad).
+It's generated from the exact PCB geometry (95×95 mm, hole/switch/encoder/OLED
+positions). Two printed parts — top plate + bottom tray — plus a PCB placeholder
+for the assembly view.
+
+**Render (OpenSCAD → File → Export):**
+- `part = "plate"`  → `../production/top_plate.stl`
+- `part = "bottom"` → `../production/bottom_tray.stl`
+- `part = "assembly"` → `agentpad_assembly.3mf` (the single assembly file Hackpad wants)
+
+**Verify before printing** (flagged `VERIFY` in the .scad): the encoder hole, OLED
+window, and USB-C cutout — their size/orientation depend on the physical modules.
+Check the USB edge/offset in KiCad's **3D Viewer** and set `usb_edge`/`usb_pos`.
+Note: the kit's **M3×16 screws are long** for a thin macropad — trim them or bump
+`comp_gap` so they don't bottom out.
 
 ## Hard limits
 - Case ≤ **200 × 200 × 100 mm**, **3D-printed only** (no acrylic/laser parts).
