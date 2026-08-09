@@ -48,10 +48,11 @@ $fn = 64;
 
 // ---- module cutouts (VERIFY against the physical modules + KiCad 3D view) --
 enc_d    = 8;               // VERIFY: EC11 bushing pass-through (~7 mm)
-oled_w   = 34; oled_h = 13; // VERIFY: 0.91" OLED window size + orientation
-usb_edge = "left";          // VERIFY: which edge the XIAO USB-C faces: left/top/right/bottom
-usb_pos  = 75;              // VERIFY: position along that edge (mm), ~XIAO Y
-usb_w    = 12; usb_h = 6;   // VERIFY: USB-C cutout width x height
+oled_w   = 24; oled_h = 13; // 0.91" OLED window (narrowed so it clears the encoder)
+usb_edge = "top";           // XIAO USB-C faces NORTH (top edge) — pins are vertical columns
+usb_pos  = 16;              // X of the port along the top edge (XIAO center: KiCad 76 - 60)
+usb_w    = 12; usb_h = 7;   // USB-C cutout width x height (spans the under-PCB gap)
+usb_depth= 13;              // reach INWARD from the edge (port is recessed ~9 mm) -> a channel
 
 /* ---- derived Z levels ---------------------------------------------------- */
 pcb_z    = floor_t + comp_gap;      // PCB bottom sits here (on the bosses)
@@ -92,16 +93,18 @@ module top_plate() {
 
 /* ---- bottom tray --------------------------------------------------------- */
 module usb_cutout() {
-    // carve a slot through the wall on the chosen edge
-    z = pcb_z;   // centered on the PCB plane-ish
+    // carve a CHANNEL through the wall + inward to the recessed port.
+    // The XIAO sits on the PCB back, so the USB port is in the under-PCB gap.
+    z = floor_t - 0.5;
+    L = usb_depth + wall + 2;   // channel length (edge -> port + through the wall)
     if (usb_edge == "left")
-        translate([-out_off - 1, usb_pos - usb_w/2, z]) cube([wall + 2, usb_w, usb_h]);
+        translate([-out_off - 1, usb_pos - usb_w/2, z]) cube([L, usb_w, usb_h]);
     else if (usb_edge == "right")
-        translate([board_w - 1 + pcb_gap, usb_pos - usb_w/2, z]) cube([wall + 2, usb_w, usb_h]);
+        translate([board_w + pcb_gap + wall + 1 - L, usb_pos - usb_w/2, z]) cube([L, usb_w, usb_h]);
     else if (usb_edge == "top")
-        translate([usb_pos - usb_w/2, board_d - 1 + pcb_gap, z]) cube([usb_w, wall + 2, usb_h]);
+        translate([usb_pos - usb_w/2, board_d + pcb_gap + wall + 1 - L, z]) cube([usb_w, L, usb_h]);
     else // bottom
-        translate([usb_pos - usb_w/2, -out_off - 1, z]) cube([usb_w, wall + 2, usb_h]);
+        translate([usb_pos - usb_w/2, -out_off - 1, z]) cube([usb_w, L, usb_h]);
 }
 
 module bosses() {
