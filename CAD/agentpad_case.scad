@@ -164,5 +164,5 @@ else if (part == "bottom") bottom_tray();
 else {                                   // assembly / fit view (explode>0 to separate)
     bottom_tray();
     pcb();
-    translate([0, 0, explode]) color([0.6, 0.6, 0.6, 0.85]) top_plate();  // translucent plate
+    translate([0, 0, plate_z + explode]) color([0.6, 0.6, 0.6, 0.85]) top_plate();  // plate sits on the PCB top
 }
