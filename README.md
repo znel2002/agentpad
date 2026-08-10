@@ -1,56 +1,78 @@
-# AgentPad *(working name — not final)*
+# AgentPad
 
-A purpose-built macropad for driving AI coding agents (Claude Code · Codex CLI · Cursor).
-Twelve keys mapped to the actions you hit dozens of times an hour — Stop / Yes / No /
-Plan-mode / New session / push-to-talk / Accept-edit / Reject-edit / Run / Compact /
-Resume / Layer — plus a rotary encoder for model/reasoning-effort and a 0.91" OLED
-showing the active tool profile and permission mode.
+A 9-key macropad + rotary encoder + OLED for driving **AI coding agents** — Claude Code, Codex CLI, and Cursor. Firmware-native (no host daemon), vendor-neutral, with a per-tool **LAYER** key instead of app-detection. Built for **Hack Club Hackpad**.
 
-Built for **Hack Club Hackpad**. Firmware-native (no host daemon for core actions);
-per-tool **LAYER** switching instead of app-detection.
+![AgentPad — real PCB in the 3D-printed case](docs/screenshots/case-assembled.png)
 
-> **Status:** design locked, pre-layout. Next: install KiCad → 3-key tutorial → this board.
->
-> - **Design spec (locked):** [docs/DESIGN-SPEC.md](docs/DESIGN-SPEC.md)
-> - **Build plan / checklist:** [docs/BUILD-PLAN.md](docs/BUILD-PLAN.md)
-> - **PCB net map + KiCad steps:** [PCB/README.md](PCB/README.md)
-> - **Firmware setup + KMK skeleton:** [Firmware/README.md](Firmware/README.md)
-> - **#hackpad message to send:** [docs/hackpad-slack-message.md](docs/hackpad-slack-message.md)
+## What it does
 
-## Hardware (locked — Config A, kit-only)
-- **MCU:** Seeed XIAO RP2040 (11 usable GPIO — the binding constraint)
-- **Keys:** 9 MX switches in a 3×3 matrix  ·  **Encoder:** 1× EC11 (turn-only)  ·  **Display:** 1× 0.91" OLED  ·  **RGB:** deferred to v2 (v1 ships without LEDs)
-- **Firmware:** KMK (CircuitPython) — QMK as fallback
-- **Layers:** 4 tool profiles — Claude Code · Codex · Cursor · shell
+Nine keys mapped to the actions you hit dozens of times an hour when driving an agent, plus a rotary dial and a status screen:
 
-## Layout (3×3)
-| Row | Keys |
-| --- | --- |
-| 1 | STOP · YES · NO |
-| 2 | PLAN · NEW · TALK |
-| 3 | RUN · COMPACT · LAYER |
-| Encoder | turn = model/effort dial (live-apply) |
-| OLED | active tool profile + effort/mode |
+| | | |
+|---|---|---|
+| **STOP** (interrupt) | **YES** (approve) | **NO** (reject) |
+| **PLAN** (mode toggle) | **NEW** (`/clear`) | **TALK** (push-to-talk) |
+| **RUN** (test/last cmd) | **COMPACT** (`/compact`) | **LAYER** (switch tool) |
 
-Secondary actions (accept-edit / reject-edit / resume / background) live on
-**hold-LAYER**. Full keymap: [docs/DESIGN-SPEC.md](docs/DESIGN-SPEC.md).
+- **Encoder** — turn = model / reasoning-effort dial.
+- **OLED** — shows the active tool profile + mode.
+- **LAYER key** — cycles per-tool keymaps: **Claude Code → Codex → Cursor → shell**. Each key sends that tool's real shortcut; hold-LAYER reaches secondary actions (accept-edit, reject-edit, resume, background). No daemon, no app-detection.
+
+Full keymap + pin map: [docs/DESIGN-SPEC.md](docs/DESIGN-SPEC.md). Keymap logic is unit-tested: [Firmware/tests/sim_keymap.py](Firmware/tests/sim_keymap.py).
+
+## Hardware
+
+- **MCU:** Seeed XIAO RP2040 (all 11 GPIO used)
+- **Keys:** 9× MX in a 3×3 diode matrix (9× 1N4148, COL2ROW)
+- **Encoder:** 1× EC11 (turn-only)
+- **Display:** 1× 0.91" SSD1306 OLED (I2C)
+- **Firmware:** KMK (CircuitPython)
+- **RGB:** deferred to v2 (v1 ships without LEDs)
+
+## Renders & proof
+
+**Exploded — top plate / PCB / bottom tray**
+![Exploded assembly](docs/screenshots/case-exploded.png)
+
+**Schematic**
+![Schematic](docs/screenshots/schematic.svg)
+
+**PCB — DRC passes with 0 errors**
+![PCB](docs/screenshots/pcb.png)
+
+## Bill of Materials
+
+All parts come from the free Hackpad kit (nothing self-sourced):
+
+| Part | Qty | Notes |
+|---|---|---|
+| Seeed XIAO RP2040 | 1 | microcontroller |
+| 1N4148 diode | 9 | switch matrix, COL2ROW, `D_DO-35_SOD27_P7.62mm` |
+| MX-style switch | 9 | solder-in, 3×3 grid @ 19.05 mm |
+| EC11 rotary encoder | 1 | model / effort dial |
+| 0.91" OLED (SSD1306) | 1 | I2C, pin order GND-VCC-SCL-SDA |
+| DSA blank keycap | 9 | color/legend via a printed card |
+| M3×16 screw | 6 | plate → heatset inserts |
+| M3 heatset insert | 6 | 4.7 mm dia × 4 mm deep |
 
 ## Repo structure
-- `CAD/` — Fusion 360 sources; one STEP/3MF of the full assembly
-- `PCB/` — KiCad project (schematic, board, care-package libs)
-- `Firmware/` — KMK source (QMK fallback)
-- `production/` — `gerbers.zip`, per-part case STL/STEP, compiled `firmware.uf2`
-- `docs/` — working notes and screenshots
 
-## Renders & proof *(to be added)*
-- [ ] Full 3D render of the assembly
-- [ ] Schematic screenshot
-- [ ] PCB (routed, front/back) screenshot
-- [ ] Case-fit / cross-section screenshot
-- [ ] DRC report: **0 errors**
+```
+CAD/         agentpad_assembly.3mf (real PCB + case), agentpad_case.scad (parametric), board STEP
+PCB/         KiCad project — schematic, board (DRC 0 errors), Hack Club care-package libs
+Firmware/    KMK source (kmk/main.py) + keymap simulation test
+production/  gerbers.zip, top_plate.stl, bottom_tray.stl, main.py
+docs/        DESIGN-SPEC, BUILD-PLAN, screenshots
+```
 
-## BOM
-*(to be added — mirrors the free Hackpad kit)*
+## Firmware (KMK)
+
+Flash CircuitPython to the XIAO, copy the KMK `kmk/` folder + libs + [`Firmware/kmk/main.py`](Firmware/kmk/main.py) to the `CIRCUITPY` drive. Details + per-layer keystroke tables: [Firmware/README.md](Firmware/README.md).
+
+## Case
+
+3D-printed sandwich — top plate + bottom tray — modeled parametrically in OpenSCAD ([CAD/agentpad_case.scad](CAD/agentpad_case.scad)) from the exact PCB geometry. Both parts print flat with no supports. Switches drop through the plate cutouts; 6× M3 screws thread into heatset inserts in the tray bosses; USB-C exits a channel on the top edge; branding is recessed on the underside.
 
 ## License
-TBD
+
+MIT — see notes; the vendored Hack Club care package under `PCB/lib/` retains its own license.
