@@ -32,8 +32,10 @@ sw_y = [26.9, 45.95, 65];
 // KiCad footprint origins are at pin 1 / a corner, NOT the component center.
 // These offsets move each cutout onto the true center (already Y-flipped for OpenSCAD).
 sw_off = [-2.54, -5.08];     // MX origin is at pin 1; the stem (keycap center) is here
-enc  = [36.75, 79.5];        // encoder shaft = origin(29.5,82) + body-center offset
-oled = [48.32, 81.02];       // OLED module center = origin(48.32,84.83) + header-center offset
+enc  = [37.0, 79.5];          // encoder shaft = origin(29.5,82) + mounting-post midpoint (7.5,-2.5)
+// OLED: J1 is a 4-pin header on the module's short edge; the module extends to one side.
+oled_pin = [48.32, 81.02];   // header pin-row center (computed from J1)
+oled_dir = 1;                // +1 = module extends +X (right, away from encoder); -1 = left  [VERIFY]
 
 /* ---- tunables ------------------------------------------------------------ */
 wall     = 2.5;              // outer wall thickness
@@ -51,7 +53,7 @@ $fn = 64;
 
 // ---- module cutouts (VERIFY against the physical modules + KiCad 3D view) --
 enc_d    = 8;               // VERIFY: EC11 bushing pass-through (~7 mm)
-oled_w   = 24; oled_h = 13; // 0.91" OLED window (narrowed so it clears the encoder)
+oled_len = 38; oled_wid = 13; // 0.91" module ~38x12mm (incl tol); window spans the module  [VERIFY]
 usb_edge = "top";           // XIAO USB-C faces NORTH (top edge) — pins are vertical columns
 usb_pos  = 16;              // X of the port along the top edge (XIAO center: KiCad 76 - 60)
 usb_w    = 12; usb_h = 7;   // USB-C cutout width x height (spans the under-PCB gap)
@@ -81,9 +83,10 @@ module top_plate() {
                 cube([sw_cut, sw_cut, plate_t + 2]);
         // encoder bushing hole
         translate([enc[0], enc[1], -1]) cylinder(d = enc_d, h = plate_t + 2);
-        // OLED window
-        translate([oled[0] - oled_w/2, oled[1] - oled_h/2, -1])
-            cube([oled_w, oled_h, plate_t + 2]);
+        // OLED module window: module mounts on the header and extends oled_dir; window spans it
+        let (ox0 = (oled_dir > 0) ? oled_pin[0] - 2 : oled_pin[0] - oled_len)
+            translate([ox0, oled_pin[1] - oled_wid/2, -1])
+                cube([oled_len + 2, oled_wid, plate_t + 2]);
         // 6 screw clearance holes
         for (h = holes)
             translate([h[0], h[1], -1]) cylinder(d = screw_d, h = plate_t + 2);
@@ -146,8 +149,9 @@ module encoder_3d() {
     color("#444444") translate([enc[0], enc[1], pcb_z + pcb_t]) cylinder(d = 12, h = 6);
     color("silver")  translate([enc[0], enc[1], pcb_z + pcb_t + 6]) cylinder(d = 6, h = 9);
 }
-module oled_3d() {
-    color("#111111") translate([oled[0] - oled_w/2, oled[1] - oled_h/2, plate_z + 0.5]) cube([oled_w, oled_h, 2]);
+module oled_3d() {   // OLED module sitting in the window (extends oled_dir from the header)
+    let (ox0 = (oled_dir > 0) ? oled_pin[0] : oled_pin[0] - oled_len)
+        color("#111111") translate([ox0, oled_pin[1] - oled_wid/2, plate_z - 1]) cube([oled_len, oled_wid, 2.5]);
 }
 module xiao_3d() {  // on the PCB BACK, in the component gap; USB-C toward the top edge
     color("#333333") translate([16 - 8.9, 75 - 10.5, pcb_z - 1.4]) cube([17.8, 21, 1.4]);
