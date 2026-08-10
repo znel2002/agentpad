@@ -35,7 +35,7 @@ Full keymap + pin map: [docs/DESIGN-SPEC.md](docs/DESIGN-SPEC.md). Keymap logic 
 ![Exploded assembly](docs/screenshots/case-exploded.png)
 
 **Schematic**
-![Schematic](docs/screenshots/schematic.svg)
+![Schematic](docs/screenshots/schematic.png)
 
 **PCB — DRC passes with 0 errors**
 ![PCB](docs/screenshots/pcb.png)
