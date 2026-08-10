@@ -29,8 +29,11 @@ holes = [[5,90],[90,90],[90,47],[90,5],[47.5,5],[5,5]];
 sw_x = [40, 59.05, 78.1];
 sw_y = [26.9, 45.95, 65];
 
-enc  = [29.5, 82];           // encoder center
-oled = [48.32, 84.83];       // OLED header center
+// KiCad footprint origins are at pin 1 / a corner, NOT the component center.
+// These offsets move each cutout onto the true center (already Y-flipped for OpenSCAD).
+sw_off = [-2.54, -5.08];     // MX origin is at pin 1; the stem (keycap center) is here
+enc  = [36.75, 79.5];        // encoder shaft = origin(29.5,82) + body-center offset
+oled = [48.32, 81.02];       // OLED module center = origin(48.32,84.83) + header-center offset
 
 /* ---- tunables ------------------------------------------------------------ */
 wall     = 2.5;              // outer wall thickness
@@ -74,7 +77,7 @@ module top_plate() {
         translate([-out_off, -out_off, 0]) rrect(out_w, out_d, plate_t, corner_r);
         // 9 switch cutouts
         for (x = sw_x, y = sw_y)
-            translate([x - sw_cut/2, y - sw_cut/2, -1])
+            translate([x + sw_off[0] - sw_cut/2, y + sw_off[1] - sw_cut/2, -1])
                 cube([sw_cut, sw_cut, plate_t + 2]);
         // encoder bushing hole
         translate([enc[0], enc[1], -1]) cylinder(d = enc_d, h = plate_t + 2);
@@ -135,8 +138,8 @@ sw_body_h = 11; cap = 18; cap_h = 6;
 
 module switches_3d() {
     for (x = sw_x, y = sw_y) {
-        color("#222222") translate([x - 7, y - 7, pcb_z + pcb_t]) cube([14, 14, sw_body_h]);
-        color("#cccccc") translate([x - cap/2, y - cap/2, pcb_z + pcb_t + sw_body_h]) cube([cap, cap, cap_h]);
+        color("#222222") translate([x + sw_off[0] - 7, y + sw_off[1] - 7, pcb_z + pcb_t]) cube([14, 14, sw_body_h]);
+        color("#cccccc") translate([x + sw_off[0] - cap/2, y + sw_off[1] - cap/2, pcb_z + pcb_t + sw_body_h]) cube([cap, cap, cap_h]);
     }
 }
 module encoder_3d() {
