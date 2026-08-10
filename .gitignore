@@ -25,5 +25,6 @@ tutorial3key/
 # routing intermediates + KiCad lock files
 *.dsn
 *.ses
+*.rules
 *.lck
 ~*.lck
