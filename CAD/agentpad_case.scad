@@ -161,6 +161,12 @@ module pcb() {
 /* ---- render -------------------------------------------------------------- */
 if (part == "plate")   top_plate();
 else if (part == "bottom") bottom_tray();
+else if (part == "realfit") {            // REAL KiCad board (STL) inside the case
+    bottom_tray();
+    // STEP export negates Y (matches our flip) -> just translate: X-60, Y+165, Z+7
+    translate([-60, 165, 7]) import("agentpad-board.stl", convexity = 10);
+    translate([0, 0, plate_z + explode]) color([0.6, 0.6, 0.6, 0.7]) top_plate();
+}
 else {                                   // assembly / fit view (explode>0 to separate)
     bottom_tray();
     pcb();
