@@ -90,10 +90,7 @@ module top_plate() {
         // 6 screw clearance holes
         for (h = holes)
             translate([h[0], h[1], -1]) cylinder(d = screw_d, h = plate_t + 2);
-        // recessed "AgentPad" branding (no supports)
-        translate([board_w/2, 15, plate_t - 0.6])
-            linear_extrude(1) text("AgentPad", size = 7, halign = "center",
-                                    valign = "center", font = "Liberation Sans:style=Bold");
+        // (branding moved to the tray underside — keeps the top plate clean)
     }
 }
 
@@ -132,6 +129,11 @@ module bottom_tray() {
         translate([-pcb_gap, -pcb_gap, floor_t])
             cube([board_w + 2*pcb_gap, board_d + 2*pcb_gap, wall_h]);
         usb_cutout();
+        // branding recessed into the underside (mirrored so it reads when flipped over)
+        translate([board_w/2, board_d/2, -0.5])
+            linear_extrude(1.2) mirror([1, 0, 0])
+                text("AgentPad", size = 9, halign = "center", valign = "center",
+                     font = "Liberation Sans:style=Bold");
     }
     bosses();
 }
