@@ -48,7 +48,9 @@ heatset_d= 4.7;             // heatset insert hole (4.7 x 4 deep, per Hackpad)
 heatset_h= 4;
 screw_d  = 3.4;             // M3 clearance hole through the plate
 sw_cut   = 14;              // MX switch cutout (standard plate cut)
-corner_r = 3;               // outer case corner radius
+corner_r = 6;               // outer case corner radius (rounder = fancier)
+bezel_h  = 4;               // raised rim above the recessed key well (Hackpad-v5 bezel look)
+rim_w    = 3.5;             // bezel rim width
 $fn = 64;
 
 // ---- module cutouts (VERIFY against the physical modules + KiCad 3D view) --
@@ -75,22 +77,37 @@ module rrect(w, d, h, r) {
 
 /* ---- top plate ----------------------------------------------------------- */
 module top_plate() {
+    H = plate_t + bezel_h;      // full height at the bezel rim
     difference() {
-        translate([-out_off, -out_off, 0]) rrect(out_w, out_d, plate_t, corner_r);
-        // 9 switch cutouts
+        union() {
+            // recessed floor (holds the switch cutouts)
+            translate([-out_off, -out_off, 0]) rrect(out_w, out_d, plate_t, corner_r);
+            // raised perimeter bezel enclosing a recessed key well
+            difference() {
+                translate([-out_off, -out_off, 0]) rrect(out_w, out_d, H, corner_r);
+                translate([-out_off + rim_w, -out_off + rim_w, plate_t])
+                    rrect(out_w - 2*rim_w, out_d - 2*rim_w, bezel_h + 2, max(corner_r - rim_w, 1));
+            }
+        }
+        // 9 switch cutouts (through the floor)
         for (x = sw_x, y = sw_y)
             translate([x + sw_off[0] - sw_cut/2, y + sw_off[1] - sw_cut/2, -1])
-                cube([sw_cut, sw_cut, plate_t + 2]);
+                cube([sw_cut, sw_cut, H + 2]);
         // encoder bushing hole
-        translate([enc[0], enc[1], -1]) cylinder(d = enc_d, h = plate_t + 2);
-        // OLED module window: module mounts on the header and extends oled_dir; window spans it
+        translate([enc[0], enc[1], -1]) cylinder(d = enc_d, h = H + 2);
+        // OLED window (recessed screen area)
         let (ox0 = (oled_dir > 0) ? oled_pin[0] - 2 : oled_pin[0] - oled_len)
             translate([ox0, oled_pin[1] - oled_wid/2, -1])
-                cube([oled_len + 2, oled_wid, plate_t + 2]);
+                cube([oled_len + 2, oled_wid, H + 2]);
         // 6 screw clearance holes
         for (h = holes)
-            translate([h[0], h[1], -1]) cylinder(d = screw_d, h = plate_t + 2);
-        // (branding moved to the tray underside — keeps the top plate clean)
+            translate([h[0], h[1], -1]) cylinder(d = screw_d, h = H + 2);
+        // soften the top outer edge (small chamfer ring)
+        translate([-out_off, -out_off, H - 1])
+            difference() {
+                rrect(out_w, out_d, 1.2, corner_r);
+                translate([1, 1, -0.5]) rrect(out_w - 2, out_d - 2, 2, corner_r);
+            }
     }
 }
 
@@ -144,7 +161,7 @@ sw_body_h = 11; cap = 18; cap_h = 6;
 module switches_3d() {
     for (x = sw_x, y = sw_y) {
         color("#222222") translate([x + sw_off[0] - 7, y + sw_off[1] - 7, pcb_z + pcb_t]) cube([14, 14, sw_body_h]);
-        color("#cccccc") translate([x + sw_off[0] - cap/2, y + sw_off[1] - cap/2, pcb_z + pcb_t + sw_body_h]) cube([cap, cap, cap_h]);
+        color("#f2f2f2") translate([x + sw_off[0] - cap/2, y + sw_off[1] - cap/2, pcb_z + pcb_t + sw_body_h]) cube([cap, cap, cap_h]);
     }
 }
 module encoder_3d() {
@@ -167,17 +184,20 @@ module pcb() {
     switches_3d(); encoder_3d(); oled_3d(); xiao_3d();
 }
 
-/* ---- render -------------------------------------------------------------- */
-if (part == "plate")   top_plate();
-else if (part == "bottom") bottom_tray();
+/* ---- render (two-tone: red plate + black base, Hackpad-v5 style) --------- */
+plate_col = "#d1272e";   // red top plate
+base_col  = "#1b1b1b";   // black bottom tray
+
+if (part == "plate")   color(plate_col) top_plate();
+else if (part == "bottom") color(base_col) bottom_tray();
 else if (part == "realfit") {            // REAL KiCad board (STL) inside the case
-    bottom_tray();
+    color(base_col) bottom_tray();
     // STEP export negates Y (matches our flip) -> just translate: X-60, Y+165, Z+7
     translate([-60, 165, 7]) import("agentpad-board.stl", convexity = 10);
-    translate([0, 0, plate_z + explode]) color([0.6, 0.6, 0.6, 0.7]) top_plate();
+    translate([0, 0, plate_z + explode]) color([0.82, 0.15, 0.18, 0.85]) top_plate();
 }
-else {                                   // assembly / fit view (explode>0 to separate)
-    bottom_tray();
+else {                                   // assembly (styled, keycaps on -> no exposed PCB)
+    color(base_col) bottom_tray();
     pcb();
-    translate([0, 0, plate_z + explode]) color([0.6, 0.6, 0.6, 0.85]) top_plate();  // plate sits on the PCB top
+    translate([0, 0, plate_z + explode]) color(plate_col) top_plate();
 }
