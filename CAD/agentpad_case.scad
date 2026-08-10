@@ -15,7 +15,7 @@
 // ============================================================================
 
 part = "assembly";           // "plate" | "bottom" | "assembly"
-explode = 14;                // assembly gap (visual only)
+explode = 0;                 // assembled fit view; set >0 (e.g. 16) to explode the stack
 
 /* ---- board geometry (fixed — from the PCB) -------------------------------- */
 board_w = 95;                // X
@@ -130,16 +130,39 @@ module bottom_tray() {
     bosses();
 }
 
-/* ---- PCB placeholder (assembly view + CAD deliverable) ------------------- */
+/* ---- realistic PCB + components (assembly fit view) ---------------------- */
+sw_body_h = 11; cap = 18; cap_h = 6;
+
+module switches_3d() {
+    for (x = sw_x, y = sw_y) {
+        color("#222222") translate([x - 7, y - 7, pcb_z + pcb_t]) cube([14, 14, sw_body_h]);
+        color("#cccccc") translate([x - cap/2, y - cap/2, pcb_z + pcb_t + sw_body_h]) cube([cap, cap, cap_h]);
+    }
+}
+module encoder_3d() {
+    color("#444444") translate([enc[0], enc[1], pcb_z + pcb_t]) cylinder(d = 12, h = 6);
+    color("silver")  translate([enc[0], enc[1], pcb_z + pcb_t + 6]) cylinder(d = 6, h = 9);
+}
+module oled_3d() {
+    color("#111111") translate([oled[0] - oled_w/2, oled[1] - oled_h/2, plate_z + 0.5]) cube([oled_w, oled_h, 2]);
+}
+module xiao_3d() {  // on the PCB BACK, in the component gap; USB-C toward the top edge
+    color("#333333") translate([16 - 8.9, 75 - 10.5, pcb_z - 1.4]) cube([17.8, 21, 1.4]);
+    color("silver")  translate([16 - 4.5, 75 + 10.5 - 1, pcb_z - 4.6]) cube([9, 8, 3.2]);
+}
 module pcb() {
-    color("green") translate([0, 0, pcb_z]) rrect(board_w, board_d, pcb_t, corner_r);
+    color("green") difference() {
+        translate([0, 0, pcb_z]) rrect(board_w, board_d, pcb_t, corner_r);
+        for (h = holes) translate([h[0], h[1], pcb_z - 1]) cylinder(d = 3.2, h = pcb_t + 2);
+    }
+    switches_3d(); encoder_3d(); oled_3d(); xiao_3d();
 }
 
 /* ---- render -------------------------------------------------------------- */
 if (part == "plate")   top_plate();
 else if (part == "bottom") bottom_tray();
-else {                                   // assembly (exploded for clarity)
+else {                                   // assembly / fit view (explode>0 to separate)
     bottom_tray();
     pcb();
-    translate([0, 0, explode]) color("gray") top_plate();
+    translate([0, 0, explode]) color([0.6, 0.6, 0.6, 0.85]) top_plate();  // translucent plate
 }
