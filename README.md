@@ -52,13 +52,12 @@ All parts come from the free Hackpad kit (nothing self-sourced):
 | EC11 rotary encoder | 1 | model / effort dial |
 | 0.91" OLED (SSD1306) | 1 | I2C, pin order GND-VCC-SCL-SDA |
 | DSA blank keycap | 9 | color/legend via a printed card |
-| M3×16 screw | 6 | plate → heatset inserts |
-| M3 heatset insert | 6 | 4.7 mm dia × 4 mm deep |
+| M3 screw | 4 | lid → base corner posts |
 
 ## Repo structure
 
 ```
-CAD/         agentpad_assembly.3mf (real PCB + case), agentpad_case.scad (parametric), board STEP
+CAD/         agentpad-case.f3d (Fusion source), agentpad_assembly.step/.3mf (case + real PCB), board STEP
 PCB/         KiCad project — schematic, board (DRC 0 errors), Hack Club care-package libs
 Firmware/    KMK source (kmk/main.py) + keymap simulation test
 production/  gerbers.zip, top_plate.stl, bottom_tray.stl, main.py
@@ -71,7 +70,13 @@ Flash CircuitPython to the XIAO, copy the KMK `kmk/` folder + libs + [`Firmware/
 
 ## Case
 
-3D-printed sandwich — top plate + bottom tray — modeled parametrically in OpenSCAD ([CAD/agentpad_case.scad](CAD/agentpad_case.scad)) from the exact PCB geometry. Both parts print flat with no supports. Switches drop through the plate cutouts; 6× M3 screws thread into heatset inserts in the tray bosses; USB-C exits a channel on the top edge; branding is recessed on the underside.
+3D-printed two-part sandwich — **top lid + bottom base** — designed in **Autodesk Fusion** ([CAD/agentpad-case.f3d](CAD/agentpad-case.f3d)) around the exact PCB (imported as STEP). Both parts print flat with no supports.
+
+- **Lid:** recessed key well inside a raised bezel; 9 switch cutouts with chamfered mouths, an encoder hole, and an OLED window; rounded R6 corners.
+- **Base:** holds the PCB on corner posts; USB-C exits a slot in the side wall; **AgentPad** engraved on the front wall; matching R6 corners and chamfered top edge.
+- **Assembly:** 4× M3 screws through the lid into the base's corner posts.
+
+Fit is verified against the real board geometry — switch cutouts sit exactly on the switch stems, and screw holes align to the base bosses.
 
 ## License
 
